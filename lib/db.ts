@@ -13,7 +13,16 @@ export interface Design {
   description: string;
 }
 
+// Interface for vote data
+export interface VoteData {
+  voter: string;
+  epoch: number;
+  design_id: number;
+  attestation: string;
+}
+
 // A utility function to map database Design to the DesignInfo type used in the UI
+// TODO!  normalize the data to match the DesignInfo type
 export function mapToDesignInfo(design: Design) {
   return {
     title: `Design #${design.design_id}`,
@@ -24,6 +33,23 @@ export function mapToDesignInfo(design: Design) {
 }
 
 export async function getAllDesigns(): Promise<Design[]> {
-  const result = await sql<Design[]>`SELECT * FROM public.designs`;
+  const result = (await sql`SELECT * FROM public.designs`) as Design[];
   return result;
+}
+
+// Function to insert a vote into the database
+export async function insertVote(voteData: VoteData) {
+  const { voter, epoch, design_id } = voteData;
+  
+  try {
+    const result = await sql`
+      INSERT INTO public.votes (voter, epoch, design_id, created_at)
+      VALUES (${voter}, ${epoch}, ${design_id}, NOW())
+      RETURNING *
+    `;
+    return result[0];
+  } catch (error) {
+    console.error('Error inserting vote:', error);
+    throw error;
+  }
 }

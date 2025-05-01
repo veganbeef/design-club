@@ -53,6 +53,25 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
           voteIndex: index,
         });
         console.log("Attestation:", attestation);
+      
+        // Call API to vote for design
+        const response = await fetch('/api/vote', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            design_id: index, 
+            epoch: 1,
+            attestation,
+          }),
+        });
+          
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Vote failed');
+        }
+
         setVoteIndex(index);
       } catch (error) {
         console.error("Failed to vote:", error);
