@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useState, useMemo } from "react";
 import { Card } from "./Card";
 import { Button } from "./Button";
 import { generateVoteAttestation } from "../utils/attest/sign";
@@ -8,6 +8,11 @@ import { Icon } from "./DemoComponents";
 import Image from "next/image";
 import { useEthersSigner } from "../utils/attest/useEthers";
 import { Signer } from "ethers";
+import {TransactionError,  TransactionResponse, Transaction, TransactionButton, TransactionStatus, TransactionStatusAction, TransactionStatusLabel, TransactionToast, TransactionToastIcon, TransactionToastLabel, TransactionToastAction } from "@coinbase/onchainkit/transaction";
+import { Abi, Address, encodeFunctionData } from "viem";
+import { useAccount } from "wagmi";
+import { useNotification } from "@coinbase/onchainkit/minikit";
+
 type DesignInfo = {
     title: string;
     caption: string;
@@ -20,9 +25,21 @@ type TabProps = {
   designInfoArray: DesignInfo[];
 };
 
+// minimal ABI for pay()
+const DESIGN_CLUB_ADDRESS = '0xC3B87b7c143D196e0B3bB36Ce003d17611dEfE4a' as Address;//process.env.NEXT_PUBLIC_DESIGN_CLUB_ADDRESS as `0x${string}`;
+const payAbi: Abi = [{
+  inputs: [],
+  name: 'pay',
+  outputs: [],
+  stateMutability: 'nonpayable',
+  type: 'function'
+}] as const;
+
 export function Designs({ setActiveTab, designInfoArray }: TabProps) {
   const signer = useEthersSigner() as Signer;
   const [voteIndex, setVoteIndex] = useState<number | null>(null);
+  const { address } = useAccount();
+  const sendNotification = useNotification();
 
   const handleVote = useCallback(
     async (index: number) => {
@@ -42,6 +59,35 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
       }
     },
     [signer]
+  );
+
+  // prepare the sponsored call
+  const calls = useMemo(
+    () =>
+      address
+        ? [
+            {
+              to: DESIGN_CLUB_ADDRESS,
+              data: encodeFunctionData({abi: payAbi, functionName: "pay"}),
+              value: BigInt(0),
+            },
+          ]
+        : [],
+    [address]
+  );
+
+  // handle onSuccess notification
+  const handleSuccess = useCallback(
+    async (response: TransactionResponse) => {
+      const txHash = response.transactionReceipts[0].transactionHash;
+      console.log("Payment successful:", txHash);
+      await sendNotification({
+        title: "Deposit Confirmed",
+        body: `Your deposit tx ${txHash} succeeded!`,
+      });
+      // optional: setPaidState(true)
+    },
+    [sendNotification]
   );
 
   return (
@@ -83,6 +129,33 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
       <Button variant="outline" onClick={() => setActiveTab("home")}>
         Back to Home
       </Button>
+      <div className="mt-4">
+        {address ? (
+          <Transaction
+            calls={calls}
+            chainId={84532} // Base Sepolia we should change this tho
+            onSuccess={handleSuccess}
+            onError={(err: TransactionError) => console.error("Deposit failed:", err)}
+          >
+              <TransactionButton className="text-white text-md" />
+
+            <TransactionStatus>
+              <TransactionStatusAction />
+              <TransactionStatusLabel />
+            </TransactionStatus>
+
+            <TransactionToast className="mb-4">
+              <TransactionToastIcon />
+              <TransactionToastLabel />
+              <TransactionToastAction />
+            </TransactionToast>
+          </Transaction>
+        ) : (
+          <p className="text-yellow-400 text-sm text-center mt-2">
+            Connect your wallet to deposit funds
+          </p>
+        )}
+      </div>
     </div>
   );
 }
