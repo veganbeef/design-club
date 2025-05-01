@@ -24,7 +24,6 @@ import { Icon } from "./components/DemoComponents";
 import { Home } from "./components/DemoComponents";
 import { Features } from "./components/DemoComponents";
 import { Designs } from "./components/Designs";
-import fs from "fs";
 
 const designInfoArray = [
   {
