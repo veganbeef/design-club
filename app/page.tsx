@@ -25,25 +25,11 @@ import { Home } from "./components/DemoComponents";
 import { Features } from "./components/DemoComponents";
 import { Designs } from "./components/Designs";
 
-const designInfoArray = [
-  {
-      "title": "Design 1",
-      "designerFid": 243300,
-      "caption": "This is the first design.",
-      "imageUrl": "https://wrpcd.net/cdn-cgi/imagedelivery/BXluQx4ige9GuW0Ia56BHw/8ef0f852-044c-4005-46c9-d8f11e0e8b00/original"
-  },
-  {
-      "title": "Design 2",
-      "designerFid": 20198,
-      "caption": "This is the second design.",
-      "imageUrl": "https://wrpcd.net/cdn-cgi/imagedelivery/BXluQx4ige9GuW0Ia56BHw/013bb4cb-585a-47ae-649d-9d9eee559d00/original"
-  }
-];
-
 export default function App() {
   const { setFrameReady, isFrameReady, context } = useMiniKit();
   const [frameAdded, setFrameAdded] = useState(false);
   const [activeTab, setActiveTab] = useState("designs");
+  const [designs, setDesigns] = useState<any[]>([]);
   const addFrame = useAddFrame();
   const openUrl = useOpenUrl();
 
@@ -52,6 +38,23 @@ export default function App() {
       setFrameReady();
     }
   }, [setFrameReady, isFrameReady]);
+
+  useEffect(() => {
+    async function fetchDesigns() {
+      try {
+        const response = await fetch('/api/designs');
+        if (!response.ok) {
+          throw new Error('Failed to fetch designs');
+        }
+        const result = await response.json();
+        setDesigns(result);
+      } catch (e) {
+        console.error('Error fetching designs:', e);
+        setDesigns([]);
+      }
+    }
+    fetchDesigns();
+  }, []);
 
   const handleAddFrame = useCallback(async () => {
     const frameAdded = await addFrame();
@@ -113,7 +116,9 @@ export default function App() {
         <main className="flex-1">
           {activeTab === "home" && <Home setActiveTab={setActiveTab} />}
           {activeTab === "features" && <Features setActiveTab={setActiveTab} />}
-          {activeTab === "designs" && <Designs setActiveTab={setActiveTab} designInfoArray={designInfoArray} />}
+          {activeTab === "designs" && (
+            <Designs setActiveTab={setActiveTab} designInfoArray={designs} />
+          )}
         </main>
 
         <footer className="mt-2 pt-4 flex justify-center">
