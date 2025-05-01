@@ -55,21 +55,39 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
         console.log("Attestation:", attestation);
       
         // Call API to vote for design
-        const response = await fetch('/api/vote', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            design_id: index, 
-            epoch: 1,
-            attestation,
-          }),
-        });
+        try {
+          // Get the wallet address (needs to be awaited)
+          const voterAddress = await signer.getAddress();
           
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Vote failed');
+          // Create request payload with all required fields
+          const payload = {
+            voter_fid: voterAddress, // Hardcoded for now, replace with actual FID when available
+            design_id: index + 1, // Adding 1 to ensure it's not zero
+            epoch: 1,
+            attestation: attestation
+          };
+          
+          console.log("Sending payload:", payload); // Debug log
+          
+          const response = await fetch('/api/vote', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload, (key, value) => {
+              // Convert BigInt values to strings
+              return typeof value === 'bigint' 
+                ? value.toString() 
+                : value;
+            }),
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Vote failed');
+          }
+        } catch (error) {
+          console.error("Failed to record the vote:", error);
         }
 
         setVoteIndex(index);
