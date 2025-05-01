@@ -56,13 +56,10 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
       
         // Call API to vote for design
         try {
-          // Get the wallet address (needs to be awaited)
-          const voterAddress = await signer.getAddress();
-          
           // Create request payload with all required fields
           const payload = {
-            voter_fid: voterAddress, // Hardcoded for now, replace with actual FID when available
-            design_id: index + 1, // Adding 1 to ensure it's not zero
+            voter: address, // Hardcoded for now, replace with actual FID when available
+            design_id: index, // Adding 1 to ensure it's not zero
             epoch: 1,
             attestation: attestation
           };
