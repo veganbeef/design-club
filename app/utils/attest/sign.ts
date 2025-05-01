@@ -1,9 +1,9 @@
 import { EAS, NO_EXPIRATION, SchemaEncoder } from '@ethereum-attestation-service/eas-sdk';
 import { Signer } from 'ethers';
 
-const EAS_CONTRACT_ADDRESS = process.env.REACT_APP_EAS_CONTRACT_ADDRESS || '<YOUR_EAS_CONTRACT_ADDRESS>';
-const VOTE_SCHEMA_UID = process.env.REACT_APP_VOTE_SCHEMA_UID || '<YOUR_VOTE_SCHEMA_UID>';
-
+const EAS_CONTRACT_ADDRESS = process.env.REACT_APP_EAS_CONTRACT_ADDRESS || '0x4200000000000000000000000000000000000021';
+const VOTE_SCHEMA_UID = process.env.REACT_APP_VOTE_SCHEMA_UID || '0x424041413f6893c2f2e3e0e91ce9e26763840795b9c7fbb3866502e8d5c94677';
+const RECIPIENT = process.env.REACT_APP_RECIPIENT || '0x7fafaA5CDBB1c238D9DEc26320131ea76f49cc80';
 /**
  * Generates an offchain EAS attestation for a vote.
  *
@@ -13,10 +13,8 @@ const VOTE_SCHEMA_UID = process.env.REACT_APP_VOTE_SCHEMA_UID || '<YOUR_VOTE_SCH
  */
 export async function generateVoteAttestation(
   signer: Signer,
-  params: { eventId: number; voteIndex: number; recipient: string }
+  { eventId, voteIndex, recipient = RECIPIENT }: { eventId: number; voteIndex: number; recipient?: string }
 ) {
-  const { eventId, voteIndex, recipient } = params;
-
   // 1. Init & connect
   const eas = new EAS(EAS_CONTRACT_ADDRESS);
   await eas.connect(signer);
@@ -28,7 +26,6 @@ export async function generateVoteAttestation(
     { name: 'eventId',  value: eventId,  type: 'uint256' },
     { name: 'voteIndex', value: voteIndex, type: 'uint8'   }
   ]);
-
   // 3. Sign offchain attestation
   const att = await offchain.signOffchainAttestation(
     {
@@ -42,6 +39,7 @@ export async function generateVoteAttestation(
     },
     signer
   );
+  console.log('Attestation:', att);
 
   return att;
 }

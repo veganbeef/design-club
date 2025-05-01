@@ -1,11 +1,13 @@
 "use client";
 
-import { type ReactNode, useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { Card } from "./Card";
 import { Button } from "./Button";
+import { generateVoteAttestation } from "../utils/attest/sign";
 import { Icon } from "./DemoComponents";
 import Image from "next/image";
-
+import { useEthersSigner } from "../utils/attest/useEthers";
+import { Signer } from "ethers";
 type DesignInfo = {
     title: string;
     caption: string;
@@ -19,22 +21,28 @@ type TabProps = {
 };
 
 export function Designs({ setActiveTab, designInfoArray }: TabProps) {
+  const signer = useEthersSigner() as Signer;
   const [voteIndex, setVoteIndex] = useState<number | null>(null);
 
-  const handleVote = useCallback(async (index: number) => {
-    try {
-      // TODO: Call API to vote for design
-      // const response = await fetch('/api/vote', {
-      //   method: 'POST',
-      //   body: JSON.stringify({ designIndex: index }),
-      // });
-      // if (!response.ok) throw new Error('Vote failed');
-      
-      setVoteIndex(index);
-    } catch (error) {
-      console.error('Failed to vote:', error);
-    }
-  }, []);
+  const handleVote = useCallback(
+    async (index: number) => {
+      if (!signer) {
+        console.error("No signer available");
+        return;
+      }
+      try {
+        const attestation = await generateVoteAttestation(signer, {
+          eventId: 1,
+          voteIndex: index,
+        });
+        console.log("Attestation:", attestation);
+        setVoteIndex(index);
+      } catch (error) {
+        console.error("Failed to vote:", error);
+      }
+    },
+    [signer]
+  );
 
   return (
     <div className="space-y-6 animate-fade-in">
