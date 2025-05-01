@@ -6,6 +6,11 @@
 .pnp.js
 .yarn/install-state.gz
 
+# solidity deps
+/contracts/dependencies
+/contracts/out
+/contracts/cache
+
 # testing
 /coverage
 
