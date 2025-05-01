@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Design 1",
+        "designer_fid": 243300,
+        "description": "This is the first design.",
+        "image": "https://wrpcd.net/cdn-cgi/imagedelivery/BXluQx4ige9GuW0Ia56BHw/8ef0f852-044c-4005-46c9-d8f11e0e8b00/original"
+    },
+    {
+        "name": "Design 2",
+        "designer_fid": 20198,
+        "description": "This is the second design.",
+        "image": "https://wrpcd.net/cdn-cgi/imagedelivery/BXluQx4ige9GuW0Ia56BHw/013bb4cb-585a-47ae-649d-9d9eee559d00/original"
+    }
+]
