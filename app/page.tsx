@@ -27,7 +27,7 @@ import { DesignInfo } from "../lib/db";
 
 export default function App() {
   const { setFrameReady, isFrameReady, context } = useMiniKit();
-  const [activeTab, setActiveTab] = useState("designs");
+  const [activeTab, setActiveTab] = useState("explainer");
   const [designs, setDesigns] = useState<DesignInfo[]>([]);
   const openUrl = useOpenUrl();
 
