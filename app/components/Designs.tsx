@@ -13,6 +13,7 @@ import { Abi, Address, encodeFunctionData } from "viem";
 import { useAccount } from "wagmi";
 import { useMiniKit, useNotification, useViewProfile } from "@coinbase/onchainkit/minikit";
 import { DesignInfo } from '../../lib/db';
+import { ShippingAddressForm } from "./ShippingAddressForm"; // Import the shipping address form
 
 // Type definition for Neynar user data
 interface NeynarUser {
@@ -62,6 +63,7 @@ export function Designs({ designInfoArray }: TabProps) {
   const { context } = useMiniKit();
   const viewProfile = useViewProfile();
   const [error, setError] = useState<string | null>(null);
+  const [paymentComplete, setPaymentComplete] = useState(false); // Track payment completion
 
   // Add this effect to log received designInfoArray
   useEffect(() => {
@@ -204,7 +206,9 @@ export function Designs({ designInfoArray }: TabProps) {
         title: "Deposit Confirmed",
         body: `Your deposit tx ${txHash} succeeded!`,
       });
-      // optional: setPaidState(true)
+      
+      // Set payment complete to show shipping form
+      setPaymentComplete(true);
     },
     [sendNotification]
   );
@@ -243,6 +247,15 @@ export function Designs({ designInfoArray }: TabProps) {
           </div>
         </div>
       )}
+
+      {/* Show shipping address form if payment is complete */}
+      {paymentComplete && (
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold mb-4">Please provide your shipping address</h2>
+          <ShippingAddressForm />
+        </div>
+      )}
+
       {designInfoArray.map((design, index) => (
         <Card
           key={index}
@@ -314,25 +327,34 @@ export function Designs({ designInfoArray }: TabProps) {
       ))}
       <div className="mt-4">
         {address ? (
-          <Transaction
-            calls={calls}
-            chainId={84532} // Base Sepolia we should change this tho
-            onSuccess={handleSuccess}
-            onError={(err: TransactionError) => console.error("Deposit failed:", err)}
-          >
-            <TransactionButton className="text-white text-md" />
+          !paymentComplete ? (
+            <Transaction
+              calls={calls}
+              chainId={84532} // Base Sepolia we should change this tho
+              onSuccess={handleSuccess}
+              onError={(err: TransactionError) => {
+                console.error("Deposit failed:", err);
+                setError("Payment failed: " + (err.message || "Unknown error"));
+              }}
+            >
+              <TransactionButton className="text-white text-md" />
 
-            <TransactionStatus>
-              <TransactionStatusAction />
-              <TransactionStatusLabel />
-            </TransactionStatus>
+              <TransactionStatus>
+                <TransactionStatusAction />
+                <TransactionStatusLabel />
+              </TransactionStatus>
 
-            <TransactionToast className="mb-4">
-              <TransactionToastIcon />
-              <TransactionToastLabel />
-              <TransactionToastAction />
-            </TransactionToast>
-          </Transaction>
+              <TransactionToast className="mb-4">
+                <TransactionToastIcon />
+                <TransactionToastLabel />
+                <TransactionToastAction />
+              </TransactionToast>
+            </Transaction>
+          ) : (
+            <div className="text-green-500 text-sm text-center">
+              Payment complete! Please fill in your shipping address above.
+            </div>
+          )
         ) : (
           <p className="text-yellow-400 text-sm text-center mt-2">
             Connect your wallet to deposit funds

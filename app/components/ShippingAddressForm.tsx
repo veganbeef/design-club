@@ -13,6 +13,7 @@ interface ShippingFormData {
   state: string;
   zipCode: string;
   country: string;
+  tShirtSize: string; // Add t-shirt size field
 }
 
 export function ShippingAddressForm() {
@@ -25,12 +26,13 @@ export function ShippingAddressForm() {
     state: "",
     zipCode: "",
     country: "",
+    tShirtSize: "M", // Default to Medium
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -170,6 +172,23 @@ export function ShippingAddressForm() {
                   className="w-full p-2 border rounded-md bg-[var(--app-background-secondary)] border-[var(--app-border)]"
                 />
               </div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium mb-1">T-Shirt Size</label>
+              <select
+                name="tShirtSize"
+                value={formData.tShirtSize}
+                onChange={handleChange}
+                required
+                className="w-full p-2 border rounded-md bg-[var(--app-background-secondary)] border-[var(--app-border)]"
+              >
+                <option value="S">Small (S)</option>
+                <option value="M">Medium (M)</option>
+                <option value="L">Large (L)</option>
+                <option value="XL">Extra Large (XL)</option>
+                <option value="XXL">Double Extra Large (XXL)</option>
+              </select>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
