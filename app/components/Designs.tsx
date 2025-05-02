@@ -11,9 +11,10 @@ import { Signer } from "ethers";
 import { TransactionError, TransactionResponse, Transaction, TransactionButton, TransactionStatus, TransactionStatusAction, TransactionStatusLabel, TransactionToast, TransactionToastIcon, TransactionToastLabel, TransactionToastAction } from "@coinbase/onchainkit/transaction";
 import { Abi, Address, encodeFunctionData } from "viem";
 import { useAccount } from "wagmi";
-import { useMiniKit, useNotification, useViewProfile } from "@coinbase/onchainkit/minikit";
 import { DesignInfo } from '../../lib/db';
 import { ShippingAddressForm } from "./ShippingAddressForm"; // Import the shipping address form
+import { useFrame } from "../providers/FrameProvider";
+import sdk from "@farcaster/frame-sdk";
 
 // Type definition for Neynar user data
 interface NeynarUser {
@@ -57,11 +58,9 @@ export function Designs({ designInfoArray }: TabProps) {
   const signer = useEthersSigner({ chainId: 84532 }) as Signer;
   const [votedDesignId, setVotedDesignId] = useState<number | null>(null);
   const { address } = useAccount();
-  const sendNotification = useNotification();
   const [designerUsers, setDesignerUsers] = useState<Record<number, NeynarUser>>({});
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
-  const { context } = useMiniKit();
-  const viewProfile = useViewProfile();
+  const { context } = useFrame();
   const [error, setError] = useState<string | null>(null);
   const [paymentComplete, setPaymentComplete] = useState(false); // Track payment completion
 
@@ -210,24 +209,20 @@ export function Designs({ designInfoArray }: TabProps) {
     async (response: TransactionResponse) => {
       const txHash = response.transactionReceipts[0].transactionHash;
       console.log("Payment successful:", txHash);
-      await sendNotification({
-        title: "Deposit Confirmed",
-        body: `Your deposit tx ${txHash} succeeded!`,
-      });
       
       // Set payment complete to show shipping form
       setPaymentComplete(true);
     },
-    [sendNotification]
+    []
   );
 
   const handleUserLinkClick = useCallback((fid: number) => {
     if (context) {
-      viewProfile(fid);
+      sdk.actions.viewProfile({fid});
     } else {
       window.open(`https://warpcast.com/${designerUsers[fid].username}`, '_blank');
     }
-  }, [context, designerUsers, viewProfile]);
+  }, [context, designerUsers]);
 
   return (
     <div className="space-y-6 animate-fade-in">

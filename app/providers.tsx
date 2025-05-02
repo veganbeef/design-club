@@ -1,24 +1,21 @@
 "use client";
 
-import { type ReactNode } from "react";
-import { baseSepolia } from "wagmi/chains";
-import { MiniKitProvider } from "@coinbase/onchainkit/minikit";
+import dynamic from "next/dynamic";
+import { FrameProvider } from "./providers/FrameProvider";
 
-export function Providers(props: { children: ReactNode }) {
+const WagmiProvider = dynamic(
+  () => import("./providers/WagmiProvider"),
+  {
+    ssr: false,
+  }
+);
+
+export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <MiniKitProvider
-      apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY}
-      chain={baseSepolia}
-      config={{
-        appearance: {
-          mode: "auto",
-          theme: "mini-app-theme",
-          name: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME,
-          logo: process.env.NEXT_PUBLIC_ICON_URL,
-        },
-      }}
-    >
-      {props.children}
-    </MiniKitProvider>
+    <WagmiProvider>
+      <FrameProvider>
+        {children}
+      </FrameProvider>
+    </WagmiProvider>
   );
 }

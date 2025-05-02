@@ -1,22 +1,5 @@
 "use client";
 
-import {
-  useMiniKit,
-  useOpenUrl,
-} from "@coinbase/onchainkit/minikit";
-import {
-  Name,
-  Identity,
-  Address,
-  Avatar,
-  EthBalance,
-} from "@coinbase/onchainkit/identity";
-import {
-  ConnectWallet,
-  Wallet,
-  WalletDropdown,
-  WalletDropdownDisconnect,
-} from "@coinbase/onchainkit/wallet";
 import { useEffect, useState } from "react";
 import { Button } from "./components/Button";
 import { Designs } from "./components/Designs";
@@ -24,18 +7,13 @@ import { Leaderboard } from "./components/Leaderboard";
 import { Upload } from "./components/Upload";
 import { Explainer } from "./components/Explainer";
 import { DesignInfo } from "../lib/db";
+import { useFrame } from "./providers/FrameProvider";
+import sdk from "@farcaster/frame-sdk";
 
 export default function App() {
-  const { setFrameReady, isFrameReady, context } = useMiniKit();
+  const { context, isSDKLoaded } = useFrame();
   const [activeTab, setActiveTab] = useState("explainer");
   const [designs, setDesigns] = useState<DesignInfo[]>([]);
-  const openUrl = useOpenUrl();
-
-  useEffect(() => {
-    if (!isFrameReady) {
-      setFrameReady();
-    }
-  }, [setFrameReady, isFrameReady]);
 
   useEffect(() => {
     async function fetchDesigns() {
@@ -67,25 +45,11 @@ export default function App() {
           </p>
         </div>
         <header className="flex justify-between items-center mb-3 h-11">
-          {!context && (
+          {isSDKLoaded && context && (
             <div>
-              <div className="flex items-center space-x-2">
-                <Wallet className="z-10">
-                  <ConnectWallet>
-                    <Name className="text-inherit" />
-                  </ConnectWallet>
-                <WalletDropdown>
-                  <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
-                    <Avatar />
-                    <Name />
-                    <Address />
-                    <EthBalance />
-                  </Identity>
-                  <WalletDropdownDisconnect />
-                </WalletDropdown>
-              </Wallet>
+              {context.user?.username}
             </div>
-          </div>)}
+          )}
           <div className="flex items-center space-x-2">
             <Button
               variant="ghost"
@@ -135,7 +99,7 @@ export default function App() {
             variant="ghost"
             size="sm"
             className="text-[var(--ock-text-foreground-muted)] text-xs"
-            onClick={() => openUrl("https://base.org/builders/minikit")}
+            onClick={() => sdk.actions.openUrl("https://base.org/builders/minikit")}
           >
             Built on Base with MiniKit
           </Button>
