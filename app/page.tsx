@@ -96,6 +96,14 @@ export default function App() {
   return (
     <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme from-[var(--app-background)] to-[var(--app-gray)]">
       <div className="w-full max-w-md mx-auto px-4 py-3">
+        <div className="text-center mb-6">
+          <h1 className="font-serif text-4xl font-bold text-[var(--app-accent)] tracking-tight">
+            DesignClub
+          </h1>
+          <p className="text-sm text-[var(--app-foreground-muted)] mt-1">
+            Monthly design competitions for the Farcaster community
+          </p>
+        </div>
         <header className="flex justify-between items-center mb-3 h-11">
           <div>
             <div className="flex items-center space-x-2">

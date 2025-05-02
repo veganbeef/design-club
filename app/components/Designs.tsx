@@ -247,7 +247,7 @@ export function Designs({ designInfoArray }: TabProps) {
         <Card
           key={index}
           title={design.title}
-          className={votedDesignId === design.designId ? "border-2 border-green-500" : ""}
+          className={votedDesignId === design.designId ? "border-2 border-blue-500" : ""}
         >
           <div className="space-y-4">
             <div className="relative w-full aspect-video">
