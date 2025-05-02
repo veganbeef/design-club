@@ -26,7 +26,6 @@ interface NeynarUser {
 }
 
 type TabProps = {
-  setActiveTab: (tab: string) => void;
   designInfoArray: DesignInfo[];
 };
 
@@ -53,7 +52,7 @@ const erc20Abi: Abi = [{
   type: "function"
 }] as const;
 
-export function Designs({ setActiveTab, designInfoArray }: TabProps) {
+export function Designs({ designInfoArray }: TabProps) {
   const signer = useEthersSigner() as Signer;
   const [votedDesignId, setVotedDesignId] = useState<number | null>(null);
   const { address } = useAccount();

@@ -130,7 +130,7 @@ export default function App() {
           {activeTab === "home" && <Home setActiveTab={setActiveTab} />}
           {activeTab === "features" && <Features setActiveTab={setActiveTab} />}
           {activeTab === "designs" && (
-            <Designs setActiveTab={setActiveTab} designInfoArray={designs} />
+            <Designs designInfoArray={designs} />
           )}
           {activeTab === "leaderboard" && (
             <Leaderboard setActiveTab={setActiveTab} designInfoArray={designs} />
