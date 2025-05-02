@@ -45,14 +45,16 @@ export function mapToDesignInfo(design: Design): DesignInfo {
 }
 
 export async function getAllDesigns(): Promise<Design[]> {
-    // Update query to join with votes table and count votes for each design
+    // Fix the query to correctly count votes for each design_id (not id)
     const result = (await sql`
         SELECT d.*, COALESCE(COUNT(v.id), 0)::int AS vote_count
         FROM public.designs d
         LEFT JOIN public.votes v ON d.design_id = v.design_id
-        GROUP BY d.id
+        GROUP BY d.id, d.design_id
         ORDER BY d.design_id
     `) as Design[];
+    
+    console.log('Raw vote counts:', result.map(d => ({ id: d.id, design_id: d.design_id, count: d.vote_count })));
     
     // Ensure vote_count is a number
     return result.map(design => ({

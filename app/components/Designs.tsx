@@ -42,7 +42,7 @@ const payAbi: Abi = [{
 
 export function Designs({ setActiveTab, designInfoArray }: TabProps) {
   const signer = useEthersSigner() as Signer;
-  const [voteIndex, setVoteIndex] = useState<number | null>(null);
+  const [votedDesignId, setVotedDesignId] = useState<number | null>(null);
   const { address } = useAccount();
   const sendNotification = useNotification();
   const [designerUsers, setDesignerUsers] = useState<Record<number, NeynarUser>>({});
@@ -145,11 +145,12 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
             const errorData = await response.json();
             throw new Error(errorData.error || 'Vote failed');
           }
+
+          // Set the voted design ID instead of index
+          setVotedDesignId(designId);
         } catch (error) {
           console.error("Failed to record the vote:", error);
         }
-
-        setVoteIndex(designId);
       } catch (error) {
         console.error("Failed to vote:", error);
       }
@@ -233,18 +234,19 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
                   {Number(design.voteCount) || 0} {Number(design.voteCount) === 1 ? 'vote' : 'votes'}
                 </span>
 
-                {voteIndex === index ? (
+                {/* Check votedDesignId against design.designId, not index */}
+                {votedDesignId === design.designId ? (
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-[var(--app-foreground-muted)]">Voted</span>
                     <Icon name="check" className="text-green-500" />
                   </div>
                 ) : (
                   <Button
-                    variant={voteIndex !== null ? "outline" : "primary"}
+                    variant={votedDesignId !== null ? "outline" : "primary"}
                     size="md"
                     onClick={() => handleVote(design.designId)}
                   >
-                    {voteIndex !== null ? "Change Vote" : "Vote"}
+                    {votedDesignId !== null ? "Change Vote" : "Vote"}
                   </Button>
                 )}
               </div>
