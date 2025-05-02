@@ -171,7 +171,8 @@ export function Designs({ designInfoArray }: TabProps) {
         }
       } catch (error) {
         console.error("Failed to vote:", error);
-        setError("Failed to vote. Please try again.");
+        const errorString = error instanceof Error ? error.message : String(error);
+        setError("Failed to vote. ".concat(errorString));
       }
     },
     [signer, address]
