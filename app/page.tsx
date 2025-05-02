@@ -19,10 +19,8 @@ import {
   WalletDropdownDisconnect,
 } from "@coinbase/onchainkit/wallet";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { Button } from "./components/DemoComponents";
-import { Icon } from "./components/DemoComponents";
-import { Home } from "./components/DemoComponents";
-import { Features } from "./components/DemoComponents";
+import { Button } from "./components/Button";
+import { Icon } from "./components/Icon";
 import { Designs } from "./components/Designs";
 import { Leaderboard } from "./components/Leaderboard";
 import { Upload } from "./components/Upload";
@@ -147,8 +145,6 @@ export default function App() {
         </header>
 
         <main className="flex-1">
-          {activeTab === "home" && <Home setActiveTab={setActiveTab} />}
-          {activeTab === "features" && <Features setActiveTab={setActiveTab} />}
           {activeTab === "designs" && (
             <Designs designInfoArray={designs} />
           )}
