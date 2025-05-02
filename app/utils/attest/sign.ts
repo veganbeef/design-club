@@ -19,13 +19,15 @@ export async function generateVoteAttestation(
   const eas = new EAS(EAS_CONTRACT_ADDRESS);
   await eas.connect(signer);
   const offchain = await eas.getOffchain();
-
+  console.log('EAS connected:', eas);
+  console.log('Offchain:', offchain);
   // 2. Encode data
   const schemaEncoder = new SchemaEncoder('uint256 eventId, uint8 voteIndex');
   const encodedData = schemaEncoder.encodeData([
     { name: 'eventId',  value: eventId,  type: 'uint256' },
     { name: 'voteIndex', value: voteIndex, type: 'uint8'   }
   ]);
+  console.log('Encoded data:', encodedData);
   // 3. Sign offchain attestation
   const att = await offchain.signOffchainAttestation(
     {
