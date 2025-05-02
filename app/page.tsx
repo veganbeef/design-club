@@ -20,7 +20,6 @@ import {
 } from "@coinbase/onchainkit/wallet";
 import { useEffect, useMemo, useState, useCallback } from "react";
 import { Button } from "./components/Button";
-import { Icon } from "./components/Icon";
 import { Designs } from "./components/Designs";
 import { Leaderboard } from "./components/Leaderboard";
 import { Upload } from "./components/Upload";
@@ -29,10 +28,8 @@ import { DesignInfo } from "../lib/db";
 
 export default function App() {
   const { setFrameReady, isFrameReady, context } = useMiniKit();
-  const [frameAdded, setFrameAdded] = useState(false);
   const [activeTab, setActiveTab] = useState("designs");
   const [designs, setDesigns] = useState<DesignInfo[]>([]);
-  const addFrame = useAddFrame();
   const openUrl = useOpenUrl();
 
   useEffect(() => {
@@ -59,38 +56,6 @@ export default function App() {
     fetchDesigns();
   }, []);
 
-  const handleAddFrame = useCallback(async () => {
-    const frameAdded = await addFrame();
-    setFrameAdded(Boolean(frameAdded));
-  }, [addFrame]);
-
-  const saveFrameButton = useMemo(() => {
-    if (context && !context.client.added) {
-      return (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={handleAddFrame}
-          className="text-[var(--app-accent)] p-4"
-          icon={<Icon name="plus" size="sm" />}
-        >
-          Save Frame
-        </Button>
-      );
-    }
-
-    if (frameAdded) {
-      return (
-        <div className="flex items-center space-x-1 text-sm font-medium text-[#0052FF] animate-fade-out">
-          <Icon name="check" size="sm" className="text-[#0052FF]" />
-          <span>Saved</span>
-        </div>
-      );
-    }
-
-    return null;
-  }, [context, frameAdded, handleAddFrame]);
-
   return (
     <div className="flex flex-col min-h-screen font-sans text-[var(--app-foreground)] mini-app-theme from-[var(--app-background)] to-[var(--app-gray)]">
       <div className="w-full max-w-md mx-auto px-4 py-3">
@@ -99,16 +64,18 @@ export default function App() {
             DesignClub
           </h1>
           <p className="text-sm text-[var(--app-foreground-muted)] mt-1">
-            Monthly design competitions for the Farcaster community
+            No tokens. No liquidity. Just a cool shirt.
           </p>
         </div>
         <header className="flex justify-between items-center mb-3 h-11">
           <div>
             <div className="flex items-center space-x-2">
               <Wallet className="z-10">
-                <ConnectWallet>
-                  <Name className="text-inherit" />
-                </ConnectWallet>
+                {!context && (
+                  <ConnectWallet>
+                    <Name className="text-inherit" />
+                  </ConnectWallet>
+                )}
                 <WalletDropdown>
                   <Identity className="px-4 pt-3 pb-2" hasCopyAddressOnClick>
                     <Avatar />
@@ -130,7 +97,6 @@ export default function App() {
             >
               Upload a Design
             </Button>
-            {saveFrameButton}
           </div>
           <div className="flex items-center space-x-2">
             <Button
@@ -140,7 +106,6 @@ export default function App() {
             >
               Leaderboard
             </Button>
-            {saveFrameButton}
           </div>
         </header>
 
