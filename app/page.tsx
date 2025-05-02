@@ -2,7 +2,6 @@
 
 import {
   useMiniKit,
-  useAddFrame,
   useOpenUrl,
 } from "@coinbase/onchainkit/minikit";
 import {
@@ -18,7 +17,7 @@ import {
   WalletDropdown,
   WalletDropdownDisconnect,
 } from "@coinbase/onchainkit/wallet";
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./components/Button";
 import { Designs } from "./components/Designs";
 import { Leaderboard } from "./components/Leaderboard";
