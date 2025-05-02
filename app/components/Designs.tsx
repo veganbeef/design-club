@@ -120,6 +120,12 @@ export function Designs({ designInfoArray }: TabProps) {
     fetchDesignerUsers();
   }, [designInfoArray]);
 
+  useEffect(() => {
+    if (context) {
+      console.log("Context loaded:", context);
+    }
+  }, [context]);
+
   const handleVote = useCallback(
     async (designId: number) => {
       if (!signer) {
