@@ -10,7 +10,7 @@ type TabProps = {
 export function Explainer({ setActiveTab }: TabProps) {
   return (
     <div className="space-y-6 animate-fade-in">
-      <Card title="How Design Club Works">
+      <Card title="How DesignClub Works">
         <div className="space-y-6">
           <div className="space-y-4">
             <div className="flex items-start space-x-3">
@@ -32,7 +32,7 @@ export function Explainer({ setActiveTab }: TabProps) {
               <div>
                 <h3 className="text-lg font-semibold">Member Voting</h3>
                 <p className="text-[var(--app-foreground-muted)]">
-                  Design Club members vote on their favorite design each month.
+                  DesignClub members vote on their favorite design each month.
                 </p>
               </div>
             </div>
