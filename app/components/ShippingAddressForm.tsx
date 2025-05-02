@@ -50,11 +50,19 @@ export function ShippingAddressForm() {
 
     try {
       // In a real app, create an attestation here
-      // Stub: create a dummy attestation
+      // Stub: create a dummy attestation with BigInt handling
       const dummyAttestation = JSON.stringify({
         type: "shipping_address",
         timestamp: new Date().toISOString(),
         data: formData,
+        // Sample BigInt values that would come from a real attestation
+        nonce: BigInt(123456789),
+        expirationTime: BigInt(Date.now() + 86400000),
+      }, (key, value) => {
+        // Convert BigInt values to strings
+        return typeof value === 'bigint' 
+          ? value.toString() 
+          : value;
       });
 
       const response = await fetch("/api/shipping-address", {
@@ -65,6 +73,11 @@ export function ShippingAddressForm() {
         body: JSON.stringify({
           wallet_address: address,
           attestation: dummyAttestation,
+        }, (key, value) => {
+          // Convert any BigInt values to strings
+          return typeof value === 'bigint' 
+            ? value.toString() 
+            : value;
         }),
       });
 
