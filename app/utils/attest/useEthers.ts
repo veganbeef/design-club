@@ -28,5 +28,5 @@ export function useEthersSigner({ chainId }: { chainId?: number } = {}) {
   console.log('client?.account', client?.account)
   console.log('client?.chain', client?.chain)
   console.log('client?.transport', client?.transport)
-  return useMemo(() => (client ? clientToSigner(client) : undefined), [client])
+  return client ? clientToSigner(client) : undefined
 }
