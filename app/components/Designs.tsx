@@ -54,7 +54,7 @@ const erc20Abi: Abi = [{
 }] as const;
 
 export function Designs({ designInfoArray }: TabProps) {
-  const signer = useEthersSigner() as Signer;
+  const signer = useEthersSigner({ chainId: 84532 }) as Signer;
   const [votedDesignId, setVotedDesignId] = useState<number | null>(null);
   const { address } = useAccount();
   const sendNotification = useNotification();
