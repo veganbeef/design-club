@@ -4,7 +4,7 @@ import { useCallback, useState, useMemo, useEffect } from "react";
 import { Card } from "./Card";
 import { Button } from "./Button";
 import { generateVoteAttestation } from "../utils/attest/sign";
-import { Icon } from "./DemoComponents";
+import { Icon } from "./Icon";
 import Image from "next/image";
 import { useEthersSigner } from "../utils/attest/useEthers";
 import { Signer } from "ethers";

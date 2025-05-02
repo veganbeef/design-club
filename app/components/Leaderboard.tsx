@@ -3,7 +3,7 @@
 import { useCallback, useState, useEffect } from "react";
 import { Card } from "./Card";
 import { Button } from "./Button";
-import { Icon } from "./DemoComponents";
+import { Icon } from "./Icon";
 import { useMiniKit, useViewProfile } from "@coinbase/onchainkit/minikit";
 import Image from "next/image";
 import { DesignInfo } from "@/lib/db";
