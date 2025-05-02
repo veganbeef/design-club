@@ -8,7 +8,7 @@ import { Icon } from "./DemoComponents";
 import Image from "next/image";
 import { useEthersSigner } from "../utils/attest/useEthers";
 import { Signer } from "ethers";
-import {TransactionError,  TransactionResponse, Transaction, TransactionButton, TransactionStatus, TransactionStatusAction, TransactionStatusLabel, TransactionToast, TransactionToastIcon, TransactionToastLabel, TransactionToastAction } from "@coinbase/onchainkit/transaction";
+import { TransactionError, TransactionResponse, Transaction, TransactionButton, TransactionStatus, TransactionStatusAction, TransactionStatusLabel, TransactionToast, TransactionToastIcon, TransactionToastLabel, TransactionToastAction } from "@coinbase/onchainkit/transaction";
 import { Abi, Address, encodeFunctionData } from "viem";
 import { useAccount } from "wagmi";
 import { useNotification } from "@coinbase/onchainkit/minikit";
@@ -48,23 +48,31 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
   const [designerUsers, setDesignerUsers] = useState<Record<number, NeynarUser>>({});
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
 
+  // Add this effect to log received designInfoArray
+  useEffect(() => {
+    if (designInfoArray.length > 0) {
+      console.log('Designs received in component:', designInfoArray);
+      console.log('First design vote count:', designInfoArray[0]?.voteCount);
+    }
+  }, [designInfoArray]);
+
   // Fetch designer user info from Neynar API
   useEffect(() => {
     const fetchDesignerUsers = async () => {
       if (!designInfoArray.length) return;
-      
+
       try {
         setIsLoadingUsers(true);
-        
+
         // Extract unique designer FIDs
         const fids = Array.from(new Set(designInfoArray.map(design => design.designerFid)));
-        
+
         // Skip if no FIDs
         if (fids.length === 0) return;
-        
+
         // Create comma-separated list of FIDs for query parameter
         const fidsParam = fids.join(',');
-        
+
         // Fetch data from Neynar API with correct query parameter format
         const response = await fetch(`https://api.neynar.com/v2/farcaster/user/bulk?fids=${fidsParam}`, {
           method: 'GET',
@@ -73,17 +81,17 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
             'api_key': process.env.NEXT_PUBLIC_NEYNAR_API_KEY || 'NEYNAR_API_DOCS',
           },
         });
-        
+
         if (!response.ok) throw new Error('Failed to fetch user data');
-        
+
         const data = await response.json();
-        
+
         // Create a map of fid to user data
         const userMap: Record<number, NeynarUser> = {};
         data.users.forEach((user: NeynarUser) => {
           userMap[user.fid] = user;
         });
-        
+
         setDesignerUsers(userMap);
       } catch (error) {
         console.error('Error fetching designer users:', error);
@@ -91,7 +99,7 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
         setIsLoadingUsers(false);
       }
     };
-    
+
     fetchDesignerUsers();
   }, [designInfoArray]);
 
@@ -107,7 +115,7 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
           voteIndex: designId,
         });
         console.log("Attestation:", attestation);
-      
+
         // Call API to vote for design
         try {
           // Create request payload with all required fields
@@ -117,9 +125,9 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
             epoch: 1,
             attestation: attestation
           };
-          
+
           console.log("Sending payload:", payload); // Debug log
-          
+
           const response = await fetch('/api/vote', {
             method: 'POST',
             headers: {
@@ -127,12 +135,12 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
             },
             body: JSON.stringify(payload, (key, value) => {
               // Convert BigInt values to strings
-              return typeof value === 'bigint' 
-                ? value.toString() 
+              return typeof value === 'bigint'
+                ? value.toString()
                 : value;
             }),
           });
-          
+
           if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || 'Vote failed');
@@ -154,12 +162,12 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
     () =>
       address
         ? [
-            {
-              to: DESIGN_CLUB_ADDRESS,
-              data: encodeFunctionData({abi: payAbi, functionName: "pay"}),
-              value: BigInt(0),
-            },
-          ]
+          {
+            to: DESIGN_CLUB_ADDRESS,
+            data: encodeFunctionData({ abi: payAbi, functionName: "pay" }),
+            value: BigInt(0),
+          },
+        ]
         : [],
     [address]
   );
@@ -204,6 +212,11 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
                       {designerUsers[design.designerFid].score && (
                         <span className="ml-2 px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
                           Score: {designerUsers[design.designerFid].score?.toLocaleString()}
+
+                        </span>
+                      )}
+                      {designerUsers[design.designerFid].follower_count && (
+                        <span className="ml-2 px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
                           Follower Count: {designerUsers[design.designerFid].follower_count?.toLocaleString()}
 
                         </span>
@@ -217,17 +230,17 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
               <div className="flex items-center space-x-3">
                 {/* Display vote count */}
                 <span className="text-sm text-[var(--app-foreground-muted)]">
-                  {design.voteCount} {design.voteCount === 1 ? 'vote' : 'votes'}
+                  {Number(design.voteCount) || 0} {Number(design.voteCount) === 1 ? 'vote' : 'votes'}
                 </span>
-                
+
                 {voteIndex === index ? (
                   <div className="flex items-center space-x-2">
                     <span className="text-sm text-[var(--app-foreground-muted)]">Voted</span>
                     <Icon name="check" className="text-green-500" />
                   </div>
                 ) : (
-                  <Button 
-                    variant={voteIndex !== null ? "outline" : "primary"} 
+                  <Button
+                    variant={voteIndex !== null ? "outline" : "primary"}
                     size="md"
                     onClick={() => handleVote(design.designId)}
                   >
@@ -250,7 +263,7 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
             onSuccess={handleSuccess}
             onError={(err: TransactionError) => console.error("Deposit failed:", err)}
           >
-              <TransactionButton className="text-white text-md" />
+            <TransactionButton className="text-white text-md" />
 
             <TransactionStatus>
               <TransactionStatusAction />

@@ -47,13 +47,18 @@ export function mapToDesignInfo(design: Design): DesignInfo {
 export async function getAllDesigns(): Promise<Design[]> {
     // Update query to join with votes table and count votes for each design
     const result = (await sql`
-        SELECT d.*, COUNT(v.id) AS vote_count
+        SELECT d.*, COALESCE(COUNT(v.id), 0)::int AS vote_count
         FROM public.designs d
         LEFT JOIN public.votes v ON d.design_id = v.design_id
         GROUP BY d.id
         ORDER BY d.design_id
     `) as Design[];
-    return result;
+    
+    // Ensure vote_count is a number
+    return result.map(design => ({
+        ...design,
+        vote_count: parseInt(design.vote_count as any, 10) || 0
+    }));
 }
 
 // Function to insert a vote into the database
