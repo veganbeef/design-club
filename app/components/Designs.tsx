@@ -11,7 +11,7 @@ import { Signer } from "ethers";
 import { TransactionError, TransactionResponse, Transaction, TransactionButton, TransactionStatus, TransactionStatusAction, TransactionStatusLabel, TransactionToast, TransactionToastIcon, TransactionToastLabel, TransactionToastAction } from "@coinbase/onchainkit/transaction";
 import { Abi, Address, encodeFunctionData } from "viem";
 import { useAccount } from "wagmi";
-import { useNotification } from "@coinbase/onchainkit/minikit";
+import { useMiniKit, useNotification, useViewProfile } from "@coinbase/onchainkit/minikit";
 import { DesignInfo } from '../../lib/db';
 
 // Type definition for Neynar user data
@@ -47,6 +47,8 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
   const sendNotification = useNotification();
   const [designerUsers, setDesignerUsers] = useState<Record<number, NeynarUser>>({});
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+  const { context } = useMiniKit();
+
 
   // Add this effect to log received designInfoArray
   useEffect(() => {
@@ -187,6 +189,14 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
     [sendNotification]
   );
 
+  const handleUserLinkClick = useCallback((fid: number) => {
+    if (context) {
+      useViewProfile()(fid);
+    } else {
+      window.open(`https://warpcast.com/${designerUsers[fid].username}`, '_blank');
+    }
+  }, [useViewProfile, context, designerUsers]);
+
   return (
     <div className="space-y-6 animate-fade-in">
       {designInfoArray.map((design, index) => (
@@ -209,7 +219,7 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
                     <span>Loading designer info...</span>
                   ) : designerUsers[design.designerFid] ? (
                     <div className="flex flex-col">
-                      <span>By @{designerUsers[design.designerFid].username}</span>
+                      <span>By <button onClick={() => handleUserLinkClick(design.designerFid)} className="text-blue-500 hover:underline">@{designerUsers[design.designerFid].username}</button></span>
                       <div className="flex flex-wrap mt-1 gap-1">
                         {designerUsers[design.designerFid].score && (
                           <span className="px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
