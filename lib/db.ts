@@ -59,7 +59,7 @@ export async function getAllDesigns(): Promise<Design[]> {
     // Ensure vote_count is a number
     return result.map(design => ({
         ...design,
-        vote_count: parseInt(design.vote_count as any, 10) || 0
+        vote_count: parseInt(design.vote_count.toString(), 10) || 0
     }));
 }
 

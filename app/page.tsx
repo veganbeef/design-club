@@ -24,12 +24,13 @@ import { Icon } from "./components/DemoComponents";
 import { Home } from "./components/DemoComponents";
 import { Features } from "./components/DemoComponents";
 import { Designs } from "./components/Designs";
+import { DesignInfo } from "../lib/db";
 
 export default function App() {
   const { setFrameReady, isFrameReady, context } = useMiniKit();
   const [frameAdded, setFrameAdded] = useState(false);
   const [activeTab, setActiveTab] = useState("designs");
-  const [designs, setDesigns] = useState<any[]>([]);
+  const [designs, setDesigns] = useState<DesignInfo[]>([]);
   const addFrame = useAddFrame();
   const openUrl = useOpenUrl();
 
@@ -47,6 +48,7 @@ export default function App() {
           throw new Error('Failed to fetch designs');
         }
         const result = await response.json();
+        console.log(result);
         setDesigns(result);
       } catch (e) {
         console.error('Error fetching designs:', e);

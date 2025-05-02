@@ -61,7 +61,8 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
   const [designerUsers, setDesignerUsers] = useState<Record<number, NeynarUser>>({});
   const [isLoadingUsers, setIsLoadingUsers] = useState(false);
   const { context } = useMiniKit();
-
+  const viewProfile = useViewProfile();
+  const [error, setError] = useState<string | null>(null);
 
   // Add this effect to log received designInfoArray
   useEffect(() => {
@@ -122,6 +123,7 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
     async (designId: number) => {
       if (!signer) {
         console.error("No signer available");
+        setError("Please connect your wallet to vote");
         return;
       }
       try {
@@ -168,9 +170,10 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
         }
       } catch (error) {
         console.error("Failed to vote:", error);
+        setError("Failed to vote. Please try again.");
       }
     },
-    [signer]
+    [signer, address]
   );
 
   // prepare the sponsored calls: first approve USDC, then pay()
@@ -209,16 +212,44 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
 
   const handleUserLinkClick = useCallback((fid: number) => {
     if (context) {
-      useViewProfile()(fid);
+      viewProfile(fid);
     } else {
       window.open(`https://warpcast.com/${designerUsers[fid].username}`, '_blank');
     }
-  }, [useViewProfile, context, designerUsers]);
+  }, [context, designerUsers, viewProfile]);
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {error && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-red-600">Error</h3>
+              <button 
+                onClick={() => setError(null)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            <p className="text-gray-700">{error}</p>
+            <div className="mt-4 flex justify-end">
+              <Button
+                variant="primary"
+                onClick={() => setError(null)}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       {designInfoArray.map((design, index) => (
-        <Card key={index} title={design.title}>
+        <Card
+          key={index}
+          title={design.title}
+          className={votedDesignId === design.designId ? "border-2 border-green-500" : ""}
+        >
           <div className="space-y-4">
             <div className="relative w-full aspect-video">
               <Image
