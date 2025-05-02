@@ -1,11 +1,4 @@
-# MiniKit Template
-
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-onchain --mini`](), configured with:
-
-- [MiniKit](https://docs.base.org/builderkits/minikit/overview)
-- [OnchainKit](https://www.base.org/builders/onchainkit)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Next.js](https://nextjs.org/docs)
+# Design Club Readme
 
 ## Getting Started
 
@@ -20,7 +13,6 @@ pnpm install
 bun install
 ```
 
-2. Verify environment variables, these will be set up by the `npx create-onchain --mini` command:
 
 You can regenerate the FARCASTER Account Association environment variables by running `npx create-onchain --manifest` in your project directory.
 
@@ -55,50 +47,46 @@ REDIS_TOKEN=
 npm run dev
 ```
 
-## Template Features
+## Running Foundry Scripts
 
-### Frame Configuration
-- `.well-known/farcaster.json` endpoint configured for Frame metadata and account association
-- Frame metadata automatically added to page headers in `layout.tsx`
+RPCs for base sepolia are available here https://chainlist.org/chain/84532
 
-### Background Notifications
-- Redis-backed notification system using Upstash
-- Ready-to-use notification endpoints in `api/notify` and `api/webhook`
-- Notification client utilities in `lib/notification-client.ts`
+Use the following commands to invoke your deployment and admin‐update scripts:
 
-### Theming
-- Custom theme defined in `theme.css` with OnchainKit variables
-- Pixel font integration with Pixelify Sans
-- Dark/light mode support through OnchainKit
+### Set Cost
+```bash
+forge script contracts/script/setCost.s.sol:SetCostScript \
+  --rpc-url $RPC_URL \
+  --broadcast
+```
 
-### MiniKit Provider
-The app is wrapped with `MiniKitProvider` in `providers.tsx`, configured with:
-- OnchainKit integration
-- Access to Frames context
-- Sets up Wagmi Connectors
-- Sets up Frame SDK listeners
-- Applies Safe Area Insets
+### Set Payment Token
+```bash
+forge script contracts/script/setPaymentToken.s.sol:SetPaymentTokenScript \
+  --rpc-url $RPC_URL \
+  --broadcast
+```
 
-## Customization
+### Transfer Admin
+```bash
+forge script contracts/script/transferAdmin.s.sol:TransferAdminScript \
+  --rpc-url $RPC_URL \
+  --broadcast
+```
 
-To get started building your own frame, follow these steps:
+### Accept Admin
+```bash
+forge script contracts/script/acceptAdmin.s.sol:AcceptAdminScript \
+  --rpc-url $RPC_URL \
+  --broadcast
+```
 
-1. Remove the DemoComponents:
-   - Delete `components/DemoComponents.tsx`
-   - Remove demo-related imports from `page.tsx`
+## Deployment Info
 
-2. Start building your Frame:
-   - Modify `page.tsx` to create your Frame UI
-   - Update theme variables in `theme.css`
-   - Adjust MiniKit configuration in `providers.tsx`
+Current test contract deployed at `0xC3B87b7c143D196e0B3bB36Ce003d17611dEfE4a`
 
-3. Add your frame to your account:
-   - Cast your frame to see it in action
-   - Share your frame with others to start building your community
+Current test currency is USDC (`0x036CbD53842c5426634e7929541eC2318f3dCF7e`)
 
-## Learn More
+Current test cost is `500000` or `$0.50`
 
-- [MiniKit Documentation](https://docs.base.org/builderkits/minikit/overview)
-- [OnchainKit Documentation](https://docs.base.org/builderkits/onchainkit/getting-started)
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
+#
