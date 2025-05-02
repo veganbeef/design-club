@@ -12,13 +12,7 @@ import {TransactionError,  TransactionResponse, Transaction, TransactionButton, 
 import { Abi, Address, encodeFunctionData } from "viem";
 import { useAccount } from "wagmi";
 import { useNotification } from "@coinbase/onchainkit/minikit";
-
-type DesignInfo = {
-    title: string;
-    caption: string;
-    designerFid: number;
-    imageUrl: string;
-};
+import { DesignInfo } from '../../lib/db';
 
 type TabProps = {
   setActiveTab: (tab: string) => void;
@@ -42,7 +36,7 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
   const sendNotification = useNotification();
 
   const handleVote = useCallback(
-    async (index: number) => {
+    async (designId: number) => {
       if (!signer) {
         console.error("No signer available");
         return;
@@ -50,7 +44,7 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
       try {
         const attestation = await generateVoteAttestation(signer, {
           eventId: 1,
-          voteIndex: index,
+          voteIndex: designId,
         });
         console.log("Attestation:", attestation);
       
@@ -59,7 +53,7 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
           // Create request payload with all required fields
           const payload = {
             voter: address, // Hardcoded for now, replace with actual FID when available
-            design_id: index, // Adding 1 to ensure it's not zero
+            design_id: designId, // Adding 1 to ensure it's not zero
             epoch: 1,
             attestation: attestation
           };
@@ -87,7 +81,7 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
           console.error("Failed to record the vote:", error);
         }
 
-        setVoteIndex(index);
+        setVoteIndex(designId);
       } catch (error) {
         console.error("Failed to vote:", error);
       }
@@ -142,20 +136,27 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
                 <p className="text-[var(--app-foreground-muted)]">{design.caption}</p>
                 <p className="text-sm text-[var(--app-foreground-muted)]">By {design.designerFid}</p>
               </div>
-              {voteIndex === index ? (
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-[var(--app-foreground-muted)]">Voted</span>
-                  <Icon name="check" className="text-green-500" />
-                </div>
-              ) : (
-                <Button 
-                  variant={voteIndex !== null ? "outline" : "primary"} 
-                  size="md"
-                  onClick={() => handleVote(index)}
-                >
-                  {voteIndex !== null ? "Change Vote" : "Vote"}
-                </Button>
-              )}
+              <div className="flex items-center space-x-3">
+                {/* Display vote count */}
+                <span className="text-sm text-[var(--app-foreground-muted)]">
+                  {design.voteCount} {design.voteCount === 1 ? 'vote' : 'votes'}
+                </span>
+                
+                {voteIndex === index ? (
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-[var(--app-foreground-muted)]">Voted</span>
+                    <Icon name="check" className="text-green-500" />
+                  </div>
+                ) : (
+                  <Button 
+                    variant={voteIndex !== null ? "outline" : "primary"} 
+                    size="md"
+                    onClick={() => handleVote(design.designId)}
+                  >
+                    {voteIndex !== null ? "Change Vote" : "Vote"}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </Card>
