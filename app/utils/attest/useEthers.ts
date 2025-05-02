@@ -25,5 +25,8 @@ export function clientToSigner(client: Client<Transport, Chain, Account>) {
 export function useEthersSigner({ chainId }: { chainId?: number } = {}) {
   const { data: client } = useConnectorClient<Config>({ chainId })
   console.log('client', client)
+  console.log('client?.account', client?.account)
+  console.log('client?.chain', client?.chain)
+  console.log('client?.transport', client?.transport)
   return useMemo(() => (client ? clientToSigner(client) : undefined), [client])
 }
