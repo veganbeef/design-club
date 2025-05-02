@@ -12,7 +12,7 @@
     "@coinbase/onchainkit": "latest",
     "@ethereum-attestation-service/eas-sdk": "^2.7.0",
     "@farcaster/frame-sdk": "^0.0.35",
-    "@farcaster/frame-wagmi-connector": "^0.0.25",
+    "@farcaster/frame-wagmi-connector": "*",
     "@neondatabase/serverless": "^1.0.0",
     "@tanstack/react-query": "^5",
     "@upstash/redis": "^1.34.4",
