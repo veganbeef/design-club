@@ -2,7 +2,6 @@
 
 import { Card } from "./Card";
 import { Button } from "./Button";
-import { Icon } from "./Icon";
 
 type TabProps = {
   setActiveTab: (tab: string) => void;
