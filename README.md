@@ -1,5 +1,7 @@
 # Design Club Readme
 
+This mini-app is setup to display designs from users, take payments and take votes to determine which design should be made into a t-shirt, t shirts can then be shipped out on a monthly (or any frequency) candence to whichever design wins.
+
 ## Getting Started
 
 1. Install dependencies:
@@ -47,9 +49,12 @@ REDIS_TOKEN=
 npm run dev
 ```
 
+4. You will need to transact on Sepolia and use USDC
+If you need USDC you can get some here: https://faucet.circle.com/
+
 ## Running Foundry Scripts
 
-RPCs for base sepolia are available here https://chainlist.org/chain/84532
+RPCs for base sepolia are available here: https://chainlist.org/chain/84532
 
 Use the following commands to invoke your deployment and admin‐update scripts:
 
@@ -88,5 +93,3 @@ Current test contract deployed at `0xC3B87b7c143D196e0B3bB36Ce003d17611dEfE4a`
 Current test currency is USDC (`0x036CbD53842c5426634e7929541eC2318f3dCF7e`)
 
 Current test cost is `500000` or `$0.50`
-
-#
