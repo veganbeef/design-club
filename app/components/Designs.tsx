@@ -203,25 +203,25 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
               <div className="space-y-2">
                 <p className="text-[var(--app-foreground-muted)]">{design.caption}</p>
                 {/* Display username and score instead of just FID */}
-                <div className="flex items-center text-sm text-[var(--app-foreground-muted)]">
+                <div className="text-sm text-[var(--app-foreground-muted)]">
                   {isLoadingUsers ? (
                     <span>Loading designer info...</span>
                   ) : designerUsers[design.designerFid] ? (
-                    <>
+                    <div className="flex flex-col">
                       <span>By @{designerUsers[design.designerFid].username}</span>
-                      {designerUsers[design.designerFid].score && (
-                        <span className="ml-2 px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
-                          Score: {designerUsers[design.designerFid].score?.toLocaleString()}
-
-                        </span>
-                      )}
-                      {designerUsers[design.designerFid].follower_count && (
-                        <span className="ml-2 px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
-                          Follower Count: {designerUsers[design.designerFid].follower_count?.toLocaleString()}
-
-                        </span>
-                      )}
-                    </>
+                      <div className="flex flex-wrap mt-1 gap-1">
+                        {designerUsers[design.designerFid].score && (
+                          <span className="px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
+                            Score: {designerUsers[design.designerFid].score?.toLocaleString()}
+                          </span>
+                        )}
+                        {designerUsers[design.designerFid].follower_count && (
+                          <span className="px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
+                            {designerUsers[design.designerFid].follower_count?.toLocaleString()} followers
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   ) : (
                     <span>By FID: {design.designerFid}</span>
                   )}
