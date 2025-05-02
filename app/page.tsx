@@ -26,6 +26,7 @@ import { Features } from "./components/DemoComponents";
 import { Designs } from "./components/Designs";
 import { Leaderboard } from "./components/Leaderboard";
 import { Upload } from "./components/Upload";
+import { Explainer } from "./components/Explainer";
 import { DesignInfo } from "../lib/db";
 
 export default function App() {
@@ -130,7 +131,6 @@ export default function App() {
               variant="primary"
               size="sm"
               onClick={() => setActiveTab("leaderboard")}
-              className="text-[var(--app-foreground-muted)]"
             >
               Leaderboard
             </Button>
@@ -150,9 +150,20 @@ export default function App() {
           {activeTab === "upload" && (
             <Upload setActiveTab={setActiveTab} />
           )}
+          {activeTab === "explainer" && (
+            <Explainer setActiveTab={setActiveTab} />
+          )}
         </main>
 
-        <footer className="mt-2 pt-4 flex justify-center">
+        <footer className="mt-2 pt-4 flex flex-col items-center space-y-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-[var(--app-foreground-muted)]"
+            onClick={() => setActiveTab("explainer")}
+          >
+            How does it work?
+          </Button>
           <Button
             variant="ghost"
             size="sm"
