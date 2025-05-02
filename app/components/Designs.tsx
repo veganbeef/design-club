@@ -172,7 +172,8 @@ export function Designs({ designInfoArray }: TabProps) {
       } catch (error) {
         console.error("Failed to vote:", error);
         const errorString = error instanceof Error ? error.message : String(error);
-        setError(`Failed to vote. Signer: ${signer} Error: ${errorString}`);
+        const signerAddress = signer ? await signer.getAddress() : "No signer";
+        setError(`Failed to vote. Signer address: ${signerAddress} Error: ${errorString}`);
       }
     },
     [signer, address]
