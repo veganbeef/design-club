@@ -25,6 +25,7 @@ import { Home } from "./components/DemoComponents";
 import { Features } from "./components/DemoComponents";
 import { Designs } from "./components/Designs";
 import { Leaderboard } from "./components/Leaderboard";
+import { Upload } from "./components/Upload";
 import { DesignInfo } from "../lib/db";
 
 export default function App() {
@@ -117,6 +118,17 @@ export default function App() {
             <Button
               variant="ghost"
               size="sm"
+              onClick={() => setActiveTab("upload")}
+              className="text-[var(--app-foreground-muted)]"
+            >
+              Upload a Design
+            </Button>
+            {saveFrameButton}
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="primary"
+              size="sm"
               onClick={() => setActiveTab("leaderboard")}
               className="text-[var(--app-foreground-muted)]"
             >
@@ -134,6 +146,9 @@ export default function App() {
           )}
           {activeTab === "leaderboard" && (
             <Leaderboard setActiveTab={setActiveTab} designInfoArray={designs} />
+          )}
+          {activeTab === "upload" && (
+            <Upload setActiveTab={setActiveTab} />
           )}
         </main>
 
