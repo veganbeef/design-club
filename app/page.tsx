@@ -24,6 +24,7 @@ import { Icon } from "./components/DemoComponents";
 import { Home } from "./components/DemoComponents";
 import { Features } from "./components/DemoComponents";
 import { Designs } from "./components/Designs";
+import { Leaderboard } from "./components/Leaderboard";
 import { DesignInfo } from "../lib/db";
 
 export default function App() {
@@ -112,7 +113,17 @@ export default function App() {
               </Wallet>
             </div>
           </div>
-          <div>{saveFrameButton}</div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setActiveTab("leaderboard")}
+              className="text-[var(--app-foreground-muted)]"
+            >
+              Leaderboard
+            </Button>
+            {saveFrameButton}
+          </div>
         </header>
 
         <main className="flex-1">
@@ -120,6 +131,9 @@ export default function App() {
           {activeTab === "features" && <Features setActiveTab={setActiveTab} />}
           {activeTab === "designs" && (
             <Designs setActiveTab={setActiveTab} designInfoArray={designs} />
+          )}
+          {activeTab === "leaderboard" && (
+            <Leaderboard setActiveTab={setActiveTab} designInfoArray={designs} />
           )}
         </main>
 

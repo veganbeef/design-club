@@ -313,9 +313,6 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
           </div>
         </Card>
       ))}
-      <Button variant="outline" onClick={() => setActiveTab("home")}>
-        Back to Home
-      </Button>
       <div className="mt-4">
         {address ? (
           <Transaction
