@@ -40,6 +40,19 @@ const payAbi: Abi = [{
   type: 'function'
 }] as const;
 
+// USDC approval ABI & constants
+const USDC_ADDRESS = "0x036CbD53842c5426634e7929541eC2318f3dCF7e" as Address;
+const erc20Abi: Abi = [{
+  inputs: [
+    { internalType: "address", name: "spender", type: "address" },
+    { internalType: "uint256", name: "amount", type: "uint256" }
+  ],
+  name: "approve",
+  outputs: [{ internalType: "bool", name: "", type: "bool" }],
+  stateMutability: "nonpayable",
+  type: "function"
+}] as const;
+
 export function Designs({ setActiveTab, designInfoArray }: TabProps) {
   const signer = useEthersSigner() as Signer;
   const [votedDesignId, setVotedDesignId] = useState<number | null>(null);
@@ -160,17 +173,22 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
     [signer]
   );
 
-  // prepare the sponsored call
+  // prepare the sponsored calls: first approve USDC, then pay()
   const calls = useMemo(
     () =>
       address
         ? [
-          {
-            to: DESIGN_CLUB_ADDRESS,
-            data: encodeFunctionData({ abi: payAbi, functionName: "pay" }),
-            value: BigInt(0),
-          },
-        ]
+            {
+              to: USDC_ADDRESS,
+              data: encodeFunctionData({ abi: erc20Abi, functionName: "approve", args: [DESIGN_CLUB_ADDRESS, BigInt(500000)] }),
+              value: BigInt(0),
+            },
+            {
+              to: DESIGN_CLUB_ADDRESS,
+              data: encodeFunctionData({ abi: payAbi, functionName: "pay", args: [] }),
+              value: BigInt(0),
+            },
+          ]
         : [],
     [address]
   );
