@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useMemo } from "react";
+import { useCallback, useState, useMemo, useEffect } from "react";
 import { Card } from "./Card";
 import { Button } from "./Button";
 import { generateVoteAttestation } from "../utils/attest/sign";
@@ -13,6 +13,17 @@ import { Abi, Address, encodeFunctionData } from "viem";
 import { useAccount } from "wagmi";
 import { useNotification } from "@coinbase/onchainkit/minikit";
 import { DesignInfo } from '../../lib/db';
+
+// Type definition for Neynar user data
+interface NeynarUser {
+  fid: number;
+  username: string;
+  display_name?: string;
+  pfp_url?: string;
+  follower_count?: number;
+  following_count?: number;
+  score?: number;
+}
 
 type TabProps = {
   setActiveTab: (tab: string) => void;
@@ -34,6 +45,55 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
   const [voteIndex, setVoteIndex] = useState<number | null>(null);
   const { address } = useAccount();
   const sendNotification = useNotification();
+  const [designerUsers, setDesignerUsers] = useState<Record<number, NeynarUser>>({});
+  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
+
+  // Fetch designer user info from Neynar API
+  useEffect(() => {
+    const fetchDesignerUsers = async () => {
+      if (!designInfoArray.length) return;
+      
+      try {
+        setIsLoadingUsers(true);
+        
+        // Extract unique designer FIDs
+        const fids = Array.from(new Set(designInfoArray.map(design => design.designerFid)));
+        
+        // Skip if no FIDs
+        if (fids.length === 0) return;
+        
+        // Create comma-separated list of FIDs for query parameter
+        const fidsParam = fids.join(',');
+        
+        // Fetch data from Neynar API with correct query parameter format
+        const response = await fetch(`https://api.neynar.com/v2/farcaster/user/bulk?fids=${fidsParam}`, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'api_key': process.env.NEXT_PUBLIC_NEYNAR_API_KEY || 'NEYNAR_API_DOCS',
+          },
+        });
+        
+        if (!response.ok) throw new Error('Failed to fetch user data');
+        
+        const data = await response.json();
+        
+        // Create a map of fid to user data
+        const userMap: Record<number, NeynarUser> = {};
+        data.users.forEach((user: NeynarUser) => {
+          userMap[user.fid] = user;
+        });
+        
+        setDesignerUsers(userMap);
+      } catch (error) {
+        console.error('Error fetching designer users:', error);
+      } finally {
+        setIsLoadingUsers(false);
+      }
+    };
+    
+    fetchDesignerUsers();
+  }, [designInfoArray]);
 
   const handleVote = useCallback(
     async (designId: number) => {
@@ -134,7 +194,25 @@ export function Designs({ setActiveTab, designInfoArray }: TabProps) {
             <div className="flex items-center justify-between">
               <div className="space-y-2">
                 <p className="text-[var(--app-foreground-muted)]">{design.caption}</p>
-                <p className="text-sm text-[var(--app-foreground-muted)]">By {design.designerFid}</p>
+                {/* Display username and score instead of just FID */}
+                <div className="flex items-center text-sm text-[var(--app-foreground-muted)]">
+                  {isLoadingUsers ? (
+                    <span>Loading designer info...</span>
+                  ) : designerUsers[design.designerFid] ? (
+                    <>
+                      <span>By @{designerUsers[design.designerFid].username}</span>
+                      {designerUsers[design.designerFid].score && (
+                        <span className="ml-2 px-1.5 py-0.5 bg-purple-100 text-purple-800 rounded-full text-xs">
+                          Score: {designerUsers[design.designerFid].score?.toLocaleString()}
+                          Follower Count: {designerUsers[design.designerFid].follower_count?.toLocaleString()}
+
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span>By FID: {design.designerFid}</span>
+                  )}
+                </div>
               </div>
               <div className="flex items-center space-x-3">
                 {/* Display vote count */}
